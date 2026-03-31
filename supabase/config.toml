@@ -1,0 +1,10 @@
+project_id = "fekkqcekknocvfzpvuuy"
+
+[functions.import-lampadaires]
+verify_jwt = false
+
+[functions.export-database]
+verify_jwt = false
+
+[functions.send-push-notification]
+verify_jwt = false
