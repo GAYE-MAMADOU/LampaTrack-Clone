@@ -125,8 +125,17 @@ function LampadaireMap({
     }).addTo(map.current);
 
     map.current.on('rotate', () => {
-      const currentBearing = (map.current as L.Map & { getBearing: () => number }).getBearing();
+      const currentBearing = (map.current as any).getBearing();
       setBearing(currentBearing);
+      // Update user marker cone to compensate for new map bearing
+      if (userMarkerRef.current && userHeadingRef.current != null) {
+        const pos = userMarkerRef.current.getLatLng();
+        const coneRotation = userHeadingRef.current - currentBearing;
+        const coneEl = userMarkerRef.current.getElement()?.querySelector('.user-direction-cone') as HTMLElement;
+        if (coneEl) {
+          coneEl.style.transform = `rotate(${coneRotation}deg)`;
+        }
+      }
     });
 
     return () => {
@@ -237,19 +246,23 @@ function LampadaireMap({
     const headingDeg = heading != null && !isNaN(heading) ? heading : null;
     userHeadingRef.current = headingDeg;
 
-    const arrowHtml = headingDeg != null
-      ? `<div class="user-heading-arrow" style="transform: rotate(${headingDeg}deg)"></div>`
-      : '';
+    // Compensate for the map's current bearing so the cone points in the real-world direction
+    const mapBearing = map.current && (map.current as any).getBearing ? (map.current as any).getBearing() : 0;
+    const coneRotation = headingDeg != null ? headingDeg - mapBearing : 0;
+    const coneVisible = headingDeg != null ? 'visible' : 'hidden';
 
     const userIcon = L.divIcon({
       className: 'user-marker',
       html: `
-        <div class="user-location-pulse"></div>
-        <div class="user-location-dot"></div>
-        ${arrowHtml}
+        <div class="user-marker-container">
+          <div class="user-direction-cone" style="transform: rotate(${coneRotation}deg); visibility: ${coneVisible}"></div>
+          <div class="user-dot-outer">
+            <div class="user-dot-inner"></div>
+          </div>
+        </div>
       `,
-      iconSize: [40, 40],
-      iconAnchor: [20, 20],
+      iconSize: [80, 80],
+      iconAnchor: [40, 40],
     });
 
     if (userMarkerRef.current) {
@@ -269,11 +282,11 @@ function LampadaireMap({
     } else {
       userAccuracyRef.current = L.circle([lat, lng], {
         radius: accuracy,
-        color: '#3b82f6',
-        fillColor: '#3b82f6',
-        fillOpacity: 0.08,
+        color: '#4285F4',
+        fillColor: '#4285F4',
+        fillOpacity: 0.06,
         weight: 1,
-        opacity: 0.3,
+        opacity: 0.2,
       }).addTo(map.current);
     }
   }, []);
