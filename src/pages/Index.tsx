@@ -114,11 +114,7 @@ export default function Index() {
     setShowReportForm(false);
   }, []);
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      navigate('/auth');
-    }
-  }, [user, authLoading, navigate]);
+  // No redirect - show public landing page instead
 
   // Welcome message for first-time users (e.g. after Google sign-up)
   useEffect(() => {
@@ -150,7 +146,67 @@ export default function Index() {
   }
 
   if (!user) {
-    return null;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background to-muted flex flex-col">
+        {/* Header */}
+        <header className="px-6 py-4 flex items-center justify-between border-b">
+          <div className="flex items-center gap-2">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary">
+              <Lamp className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <span className="font-bold text-xl">LampaTrack</span>
+          </div>
+          <Button onClick={() => navigate('/auth')}>Se connecter</Button>
+        </header>
+
+        {/* Hero */}
+        <main className="flex-1 flex flex-col items-center justify-center text-center px-6 py-16 space-y-6">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 mb-2">
+            <Lamp className="h-10 w-10 text-primary" />
+          </div>
+          <h1 className="text-4xl font-bold tracking-tight">LampaTrack</h1>
+          <p className="text-xl text-muted-foreground max-w-md">
+            Signalez les lampadaires défectueux à Yeumbeul Nord et contribuez à améliorer l'éclairage public de votre quartier.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 mt-4">
+            <Button size="lg" onClick={() => navigate('/auth')}>
+              Commencer
+            </Button>
+            <Button size="lg" variant="outline" onClick={() => navigate('/auth')}>
+              Se connecter
+            </Button>
+          </div>
+
+          {/* Features */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-12 max-w-2xl w-full text-left">
+            <div className="bg-card border rounded-lg p-4 space-y-2">
+              <MapPin className="h-6 w-6 text-primary" />
+              <h3 className="font-semibold">Localisation précise</h3>
+              <p className="text-sm text-muted-foreground">Identifiez les lampadaires sur la carte interactive de Yeumbeul Nord.</p>
+            </div>
+            <div className="bg-card border rounded-lg p-4 space-y-2">
+              <AlertTriangle className="h-6 w-6 text-primary" />
+              <h3 className="font-semibold">Signalement simple</h3>
+              <p className="text-sm text-muted-foreground">Photographiez et signalez un lampadaire défectueux en quelques secondes.</p>
+            </div>
+            <div className="bg-card border rounded-lg p-4 space-y-2">
+              <CheckCircle className="h-6 w-6 text-primary" />
+              <h3 className="font-semibold">Suivi en temps réel</h3>
+              <p className="text-sm text-muted-foreground">Suivez le traitement de vos signalements et soyez notifié des mises à jour.</p>
+            </div>
+          </div>
+        </main>
+
+        {/* Footer */}
+        <footer className="border-t py-4 px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
+          <span>© {new Date().getFullYear()} LampaTrack — Yeumbeul Nord, Sénégal</span>
+          <div className="flex gap-4">
+            <a href="/privacy" className="hover:text-foreground transition-colors">Politique de confidentialité</a>
+            <a href="/terms" className="hover:text-foreground transition-colors">Conditions d'utilisation</a>
+          </div>
+        </footer>
+      </div>
+    );
   }
 
   const handleReport = () => {
